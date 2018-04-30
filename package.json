@@ -1,0 +1,29 @@
+{
+  "name": "mtgbackend",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "concurrently \"tsc --watch\" \"nodemon dist/app.js\""
+  },
+  "dependencies": {
+    "server": "^1.0.18",
+    "node-localstorage": "^0.1.0",
+    "randomstring": "^1.1.5",
+    "crypto": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.0",
+    "@types/node": "^10.0.0",
+    "concurrently": "^3.5.1",
+    "eslint": "^4.19.1",
+    "nodemon": "^1.17.3",
+    "open": "^0.0.5",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-promise": "^3.7.0",
+    "mocha": "^5.1.1",
+    "supertest": "^3.0.0",
+    "tsc": "^1.20150623.0",
+    "typescript": "^2.8.3",
+    "typescript-eslint-parser": "^15.0.0"
+  }
+}

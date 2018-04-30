@@ -1,0 +1,8 @@
+.idea
+*.js
+node_modules
+db
+accountIndex
+cardIndex
+priceHistory
+dist
