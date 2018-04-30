@@ -17,10 +17,6 @@ includes.forEach(folder => walkSync(folder, 0) );
 
 
 async function main() {
-  const connection = {
-    uri: 'mongodb://localhost:27017',
-    db: 'securelogin'
-  };
 
   var server = http.createServer((req, res) => {
     Route.registry.call(req.url, req, res, {cardIndex: cardIndex, priceHistory:priceHistory, accountIndex:accountIndex});
