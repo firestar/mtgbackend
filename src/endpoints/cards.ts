@@ -1,4 +1,4 @@
-const { Route } = require('../route');
+import { Route } from '../route';
 
 class Cards{
   @Route.path.register("/cards/list")

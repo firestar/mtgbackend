@@ -1,6 +1,7 @@
-var LocalStorage = require('node-localstorage').LocalStorage;
+import * as LocalStorageClass from 'node-localstorage';
+const LocalStorage = LocalStorageClass.LocalStorage;
 
-export class DB {
+class DB {
   localStorage = null;
   cache = {};
   saveDataQueue = {};
@@ -8,7 +9,7 @@ export class DB {
     this.localStorage = new LocalStorage('./' + file);
     // saving handler, lets not spam the disk...
     setInterval(() => {
-      const keys = Object.keys(this.saveDataQueue);
+      var keys = Object.keys(this.saveDataQueue);
       for (let i = 0; i < keys.length; i++) {
         let data = this.saveDataQueue[keys[i]];
         this.localStorage.setItem(keys[i], JSON.stringify(data));
@@ -45,3 +46,5 @@ export class DB {
     }
   }
 }
+
+export { DB }

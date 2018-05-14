@@ -1,6 +1,6 @@
-const { Route } = require('../route');
-var crypt = require('crypto');
-var randomstring = require("randomstring");
+import { Route } from '../route';
+import * as crypt  from "crypto";
+import * as randomstring  from "randomstring";
 
 class Authentication {
   static memory = {
