@@ -21,5 +21,10 @@ pipeline {
         sh 'docker build ./ -t firestarthehack/mtgbackend:latest'
       }
     }
+    stage('Push Docker Image') {
+      steps {
+        sh 'docker push'
+      }
+    }
   }
 }
