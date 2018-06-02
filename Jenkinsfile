@@ -16,9 +16,9 @@ pipeline {
         sh 'npm run build'
       }
     }
-    stage('') {
+    stage('Build Docker Image') {
       steps {
-        sh 'docker build ./'
+        sh 'docker build ./ -t firestarthehack/mtgbackend:latest'
       }
     }
   }
