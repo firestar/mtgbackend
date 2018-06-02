@@ -17,4 +17,17 @@ class Cards{
       conn.client.send({status: 'success', data: data});
     });
   }
+  @Route.path.register("/cards/change")
+  cardChangeRequest(conn){
+    if (!conn.client.data) {
+      conn.client.send({status: 'error', message: 'card change request empty'});
+      conn.complete();
+    }
+    conn.client.data.each((i, item)=>{
+      console.log(item);
+    });
+    /*conn.client.response.privateData.cardIndex.set(conn.client.account, conn.client.data, data => {
+      conn.client.send({status: 'success', data: data});
+    });*/
+  }
 }
