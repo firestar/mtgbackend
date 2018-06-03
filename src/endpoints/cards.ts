@@ -23,6 +23,7 @@ class Cards{
       conn.client.send({status: 'error', message: 'card change request empty'});
       conn.complete();
     }
+    console.log(conn.client.data);
     conn.client.data.each((i, item)=>{
       console.log(item);
     });
