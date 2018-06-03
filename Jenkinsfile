@@ -13,7 +13,7 @@ node {
         stage('Build') {
           dockerImage.inside{
             sh 'npm install'
-            sh 'npm build'
+            sh 'np run build'
           }
         }
         stage('Docker Build') {
