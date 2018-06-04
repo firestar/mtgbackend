@@ -35,7 +35,12 @@ class DB {
   get(key, func, time = 2/24) {
     const date = new Date();
     if (!this.isCacheValid(key)){
-      const data = JSON.parse(this.localStorage.getItem(key));
+      const storedData = this.localStorage.getItem(key);
+      if (!storedData) {
+        func(null);
+        return;
+      }
+      const data = JSON.parse(storedData);
       const date = new Date();
       date.setDate(date.getDate() + time);
       this.cache[key] = {data: data, date: date, hits: 0};

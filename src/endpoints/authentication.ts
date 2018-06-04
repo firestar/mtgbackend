@@ -50,7 +50,7 @@ class Authentication {
       }
     });
   }
-  @Route.path.register(['/cards', '/auth'], false)
+  @Route.path.register([ '/auth'], false)
   authentication(conn) {
     const sessionKey = conn.client.req.headers.session;
     if (!sessionKey || sessionKey.length < 2) {

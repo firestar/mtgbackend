@@ -3,10 +3,13 @@ import { DB } from './database/cached_storage';
 import * as fs from 'fs';
 import * as path from "path";
 import { Route } from './route';
+import { InventoryControl } from "./service/inventoryControl";
 
 const cardIndex = new DB('cardIndex');
 const priceHistory = new DB('priceHistory');
 const accountIndex = new DB('accountIndex');
+
+const cardInventory = new InventoryControl(cardIndex);
 
 var includes = ['./dist/endpoints'];
 var depthLimit = 4;
@@ -17,10 +20,10 @@ includes.forEach(folder => walkSync(folder, 0) );
 
 async function main() {
   var server = http.createServer((req, res) => {
-    Route.registry.call(req.url, req, res, {cardIndex: cardIndex, priceHistory:priceHistory, accountIndex:accountIndex});
+    Route.registry.call(req.url, req, res, {cardIndex: cardIndex, priceHistory:priceHistory, accountIndex:accountIndex, cardInventory:cardInventory});
   });
   server.listen(80, () => {
-    console.log("Listening on port");
+    console.log("Listening on port 80");
   });
 }
 main();

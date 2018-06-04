@@ -1,4 +1,5 @@
 import { Route } from '../route';
+import {InventoryRequestHandler} from "../service/inventoryControl";
 
 class Cards{
   @Route.path.register("/cards/list")
@@ -17,16 +18,26 @@ class Cards{
       conn.client.send({status: 'success', data: data});
     });
   }
+
   @Route.path.register("/cards/change")
   cardChangeRequest(conn){
     if (!conn.client.data) {
       conn.client.send({status: 'error', message: 'card change request empty'});
       conn.complete();
     }
-    console.log(conn.client.data);
-    conn.client.data.each((i, item)=>{
-      console.log(item);
-    });
+    const handler = new InventoryRequestHandler(conn.client.data.data);
+    const requestStatusObject = {};
+    const callNext = () => {
+      const request = handler.next();
+      if (request === null) {
+        conn.client.send({status: 'success', rso: requestStatusObject});
+        conn.complete();
+        return;
+      }
+      conn.client.response.privateData.cardInventory.handleRequest("firestar", request, callNext, requestStatusObject);
+    }
+    callNext();
+    conn.wait();
     /*conn.client.response.privateData.cardIndex.set(conn.client.account, conn.client.data, data => {
       conn.client.send({status: 'success', data: data});
     });*/
