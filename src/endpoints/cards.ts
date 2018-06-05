@@ -28,8 +28,8 @@ class Cards{
     const handler = new InventoryRequestHandler(conn.client.data.data);
     const requestStatusObject = {};
     const callNext = () => {
-      const request = handler.next();
-      if (request === null) {
+      let request=null;
+      if ((request = handler.next()) === null) {
         conn.client.send({status: 'success', rso: requestStatusObject});
         conn.complete();
         return;

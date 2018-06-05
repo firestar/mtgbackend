@@ -32,6 +32,12 @@ class DB {
     }
     return false;
   }
+  delete(key, func = ()=>{}){
+    delete this.saveDataQueue[key];
+    delete this.cache[key];
+    this.localStorage.delete(key);
+    func();
+  }
   get(key, func, time = 2/24) {
     const date = new Date();
     if (!this.isCacheValid(key)){

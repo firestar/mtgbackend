@@ -18,12 +18,18 @@ class InventoryControl {
           }
           obj = obj[request.key[i]];
         }
+        if (!obj[request.direction[0]]) {
+            obj[request.direction[0]]=0;
+        }
         if(obj[request.direction[0]] + request.direction[1] === request.expected){
-          rSO[request.id] = {"accept": true, "result": request.expected};
+          rSO[request.id] = {"accept": true, "expected": request.expected, "result":(obj[request.direction[0]] + request.direction[1])};
         }else{
           rSO[request.id] = {"accept": false, "expected": request.expected, "result": (obj[request.direction[0]] + request.direction[1])};
         }
         func();
+      } else {
+          rSO[request.id] = {"accept": false, "expected": request.expected, "result": "error"};
+          func();
       }
     })
   }

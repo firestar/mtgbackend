@@ -3,9 +3,6 @@ import * as crypt  from "crypto";
 import * as randomstring  from "randomstring";
 
 class Authentication {
-  static memory = {
-    session: {}
-  };
   @Route.path.register("/authentication/register")
   registration(conn){
     const username = conn.client.data.username.toLowerCase();
@@ -42,15 +39,15 @@ class Authentication {
     conn.client.response.privateData.accountIndex.get(data[0].toLowerCase(), accData => {
       if (accData && hashedPassword === accData.password) {
         const sessionKey = randomstring.generate(40);
-        Authentication.memory.session[sessionKey] = {account: data[0].toLowerCase()};
-
-        conn.client.send({status: 'success', session: sessionKey});
+          conn.client.response.privateData.sessions.set(sessionKey, {account: data[0].toLowerCase()}, session =>{
+            conn.client.send({status: 'success', session: sessionKey});
+          });
       } else {
         conn.client.send({status: 'error', message: 'account not found', code: '112'});
       }
     });
   }
-  @Route.path.register([ '/auth'], false)
+  @Route.path.register([ '/cards', '/auth' ], false)
   authentication(conn) {
     const sessionKey = conn.client.req.headers.session;
     if (!sessionKey || sessionKey.length < 2) {
@@ -58,19 +55,21 @@ class Authentication {
       conn.complete();
       return;
     }
-    if (Authentication.memory.session[sessionKey]) {
-      conn.client.response.privateData.accountIndex.get(Authentication.memory.session[sessionKey].account, accData => {
-        if (accData) {
-          conn.proceed({account: Authentication.memory.session[sessionKey].account});
-        } else {
-          conn.client.send({status: 'error', message: 'account not found', code: '139'});
-          conn.complete();
-        }
-      });
-    } else {
-      conn.client.send({status: 'error', message: 'account not found', code: '131'});
-      conn.complete();
-    }
+    conn.client.response.privateData.sessions.get(sessionKey, session=>{
+      if (session) {
+        conn.client.response.privateData.accountIndex.get(session.account, accData => {
+          if (accData) {
+            conn.proceed({account: session.account});
+          } else {
+            conn.client.send({status: 'error', message: 'account not found', code: '139'});
+            conn.complete();
+          }
+        });
+      } else {
+        conn.client.send({status: 'error', message: 'account not found', code: '131'});
+        conn.complete();
+      }
+    });
   }
   @Route.path.register("/auth/logout")
   logout(conn) {
@@ -80,21 +79,23 @@ class Authentication {
       conn.complete();
       return;
     }
-    if (Authentication.memory.session[sessionKey]) {
-      conn.client.response.privateData.accountIndex.get(Authentication.memory.session[sessionKey].account, accData => {
-        if (accData) {
-          delete Authentication.memory.session[sessionKey];
-          conn.client.send({status: 'success'});
-          conn.complete();
-        } else {
-          conn.client.send({status: 'error', message: 'account not found', code: '129'});
-          conn.complete();
-        }
-      });
-    } else {
-      conn.client.send({status: 'error', message: 'account not found', code: '121'});
-      conn.complete();
-    }
+    conn.client.response.privateData.sessions.get(sessionKey, session=>{
+      if (session) {
+        conn.client.response.privateData.accountIndex.get(session.account, accData => {
+          if (accData) {
+              conn.client.response.privateData.sessions.delete(sessionKey);
+            conn.client.send({status: 'success'});
+            conn.complete();
+          } else {
+            conn.client.send({status: 'error', message: 'account not found', code: '129'});
+            conn.complete();
+          }
+        });
+      } else {
+        conn.client.send({status: 'error', message: 'account not found', code: '121'});
+        conn.complete();
+      }
+    })
   }
   @Route.path.register('/auth/loggedin')
   loggedin(conn) {
@@ -104,19 +105,21 @@ class Authentication {
       conn.complete();
       return;
     }
-    if (Authentication.memory.session[sessionKey]) {
-      conn.client.response.privateData.accountIndex.get(Authentication.memory.session[sessionKey].account, accData => {
-        if (accData) {
-          conn.client.send({status:'success', account: Authentication.memory.session[sessionKey].account});
-        } else {
-          conn.client.send({status: 'error', message: 'account not found', code: '139'});
-          conn.complete();
-        }
-      });
-    } else {
-      conn.client.send({status: 'error', message: 'account not found', code: '131'});
-      conn.complete();
-    }
+    conn.client.response.privateData.sessions.get(sessionKey, session=>{
+      if (session) {
+        conn.client.response.privateData.accountIndex.get(session.account, accData => {
+          if (accData) {
+            conn.client.send({status:'success', account: session.account});
+          } else {
+            conn.client.send({status: 'error', message: 'account not found', code: '139'});
+            conn.complete();
+          }
+        });
+      } else {
+        conn.client.send({status: 'error', message: 'account not found', code: '131'});
+        conn.complete();
+      }
+    })
   }
 }
 exports.Authentication = Authentication;
