@@ -16,6 +16,7 @@ class Authentication {
       if (accData) {
         conn.client.send({status: 'error', message: 'account already exists', code: '109'});
       } else {
+        conn.client.response.privateData.cardIndex.set(username, {}, ()=>{});
         conn.client.response.privateData.accountIndex.set(username, {password: hashedPassword}, account => {
           conn.client.send({status: 'success', account: username });
         });

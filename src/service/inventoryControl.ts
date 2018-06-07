@@ -22,6 +22,7 @@ class InventoryControl {
             obj[request.direction[0]]=0;
         }
         if(obj[request.direction[0]] + request.direction[1] === request.expected){
+          const newValue = obj[request.direction[0]] + request.direction[1];
           rSO[request.id] = {"accept": true, "expected": request.expected, "result":(obj[request.direction[0]] + request.direction[1])};
         }else{
           rSO[request.id] = {"accept": false, "expected": request.expected, "result": (obj[request.direction[0]] + request.direction[1])};
