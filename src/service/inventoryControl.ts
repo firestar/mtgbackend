@@ -1,12 +1,21 @@
 import {DB} from "../database/cached_storage";
+var randomstring = require("randomstring");
 
 class InventoryControl {
 
   db = null;
-  constructor(database: DB){
+  sync = null;
+  constructor(database: DB, sync: DB){
     this.db = database;
+    this.sync = sync;
   }
-
+  generateActionId(dataSync, func = aid=>{}){
+    const actionId = randomstring.generate(15);
+    if(!dataSync.index[actionId]) {
+      return func(actionId);
+    }
+    this.generateActionId(dataSync, func);
+  }
   handleRequest(user, request, func, rSO={}){
     const self = this;
     self.db.get(user, (data)=>{
@@ -22,11 +31,36 @@ class InventoryControl {
             obj[request.direction[0]]=0;
         }
         if(obj[request.direction[0]] + request.direction[1] === request.expected){
-          rSO[request.id] = {"accept": true, "expected": request.expected, "result":(obj[request.direction[0]] + request.direction[1])};
+          const newValue = obj[request.direction[0]] + request.direction[1];
+          obj[request.direction[0]] = newValue;
+          data.change();
+          this.sync.get(user, (dataSync)=>{
+            this.generateActionId(dataSync, aid=>{
+
+              const idx = dataSync.actions.push({
+                direction: request.direction,
+                expected: request.expected,
+                id: request.id,
+                aid: aid
+              });
+              data['_sync_latest_idx'] = idx;
+              dataSync.index[aid] = true;
+              dataSync.change();
+
+              rSO[request.id] = {
+                "accept": true,
+                "expected": request.expected,
+                "result": obj[request.direction[0]],
+                aid: aid
+              };
+
+              func();
+            });
+          });
         }else{
           rSO[request.id] = {"accept": false, "expected": request.expected, "result": (obj[request.direction[0]] + request.direction[1])};
+          func();
         }
-        func();
       } else {
           rSO[request.id] = {"accept": false, "expected": request.expected, "result": "error"};
           func();
@@ -50,6 +84,6 @@ class InventoryRequestHandler{
     this.idx ++;
     return this.request[this.idx];
   }
-};
+}
 
 export {InventoryControl, InventoryRequestHandler}

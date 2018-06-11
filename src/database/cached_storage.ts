@@ -4,6 +4,7 @@ const LocalStorage = LocalStorageClass.LocalStorage;
 class DB {
   localStorage = null;
   cache = {};
+  hashKey = "";
   saveDataQueue = {};
   constructor( private file: String ) {
     this.localStorage = new LocalStorage('./' + file);
@@ -13,6 +14,7 @@ class DB {
       for (let i = 0; i < keys.length; i++) {
         let data = this.saveDataQueue[keys[i]];
         this.localStorage.setItem(keys[i], JSON.stringify(data));
+        console.log("saved",keys[i]);
         delete this.saveDataQueue[keys[i]];
       }
     }, 10000);
@@ -46,13 +48,16 @@ class DB {
         func(null);
         return;
       }
-      const data = JSON.parse(storedData);
       const date = new Date();
       date.setDate(date.getDate() + time);
-      this.cache[key] = {data: data, date: date, hits: 0};
-      func(data);
+      var data = JSON.parse(storedData);
+      const dataWrap = {data: data, date: date, changes: 0};
+      data.change = ()=>{
+        this.saveDataQueue[key] = data;
+      };
+      this.cache[key] = dataWrap;
+      func(this.cache[key].data);
     } else {
-      this.cache[key].hits++;
       func(this.cache[key].data);
     }
   }
