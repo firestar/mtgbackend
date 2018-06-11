@@ -18,6 +18,8 @@ class Authentication {
       } else {
         conn.client.response.privateData.cardIndex.set(username, {}, ()=>{});
         conn.client.response.privateData.accountIndex.set(username, {password: hashedPassword}, account => {
+          conn.client.response.privateData.sync.set(username, [], ()=>{});
+          conn.client.response.privateData.cardIndex.set(username, {}, ()=>{});
           conn.client.send({status: 'success', account: username });
         });
       }
